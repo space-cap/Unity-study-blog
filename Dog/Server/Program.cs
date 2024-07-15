@@ -3,13 +3,12 @@ using System.Threading;
 
 class Program
 {
-    private static int _x = 0;
-    private static int _y = 0;
+    private static int counter = 0;
 
     static void Main()
     {
-        Thread t1 = new Thread(Thread1);
-        Thread t2 = new Thread(Thread2);
+        Thread t1 = new Thread(IncrementCounter);
+        Thread t2 = new Thread(DecrementCounter);
 
         t1.Start();
         t2.Start();
@@ -17,20 +16,22 @@ class Program
         t1.Join();
         t2.Join();
 
-        Console.WriteLine($"x: {_x}, y: {_y}");
+        Console.WriteLine($"Final counter value: {counter}");
     }
 
-    static void Thread1()
+    static void IncrementCounter()
     {
-        _x = 1; // Write to _x
-        Thread.MemoryBarrier(); // Insert a memory barrier
-        _y = 1; // Write to _y
+        for (int i = 0; i < 1000; i++)
+        {
+            Interlocked.Increment(ref counter);
+        }
     }
 
-    static void Thread2()
+    static void DecrementCounter()
     {
-        while (_y != 1) ; // Wait until _y is set to 1
-        Thread.MemoryBarrier(); // Insert a memory barrier
-        Console.WriteLine(_x); // Read _x
+        for (int i = 0; i < 1000; i++)
+        {
+            Interlocked.Decrement(ref counter);
+        }
     }
 }
