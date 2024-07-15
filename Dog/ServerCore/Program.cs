@@ -3,28 +3,31 @@ using System.Threading;
 
 class Program
 {
+    private static object _lock = new object();
+    private static int _counter = 0;
+
     static void Main()
     {
-        // Create a new thread
-        Thread myThread = new Thread(new ThreadStart(MyThreadMethod));
+        Thread t1 = new Thread(IncrementCounter);
+        Thread t2 = new Thread(IncrementCounter);
 
-        // Start the thread
-        myThread.Start();
+        t1.Start();
+        t2.Start();
 
-        // Do something on the main thread
-        for (int i = 0; i < 10; i++)
-        {
-            Console.WriteLine("Main thread: " + i);
-            Thread.Sleep(100);
-        }
+        t1.Join();
+        t2.Join();
+
+        Console.WriteLine("Counter: " + _counter);
     }
 
-    static void MyThreadMethod()
+    static void IncrementCounter()
     {
-        for (int i = 0; i < 10; i++)
+        for (int i = 0; i < 1000; i++)
         {
-            Console.WriteLine("MyThreadMethod: " + i);
-            Thread.Sleep(100);
+            lock (_lock)
+            {
+                _counter++;
+            }
         }
     }
 }
