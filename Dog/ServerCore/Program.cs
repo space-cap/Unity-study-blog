@@ -1,19 +1,25 @@
 ﻿using System;
-using System.Threading;
+using System.Threading.Tasks;
 
 class Program
 {
-    static void Main()
+    static async Task Main()
     {
-        ThreadPool.QueueUserWorkItem(new WaitCallback(DoWork));
+        // 작업 시작
+        Task task = Task.Run(() => DoWork());
 
-        // 메인 쓰레드에서 다른 작업 수행
-        Console.WriteLine("Main thread is doing some work.");
-        Thread.Sleep(1000); // ThreadPool 쓰레드가 완료될 시간을 줌
+        // 작업이 완료될 때까지 대기
+        await task;
+
+        Console.WriteLine("Task completed.");
     }
 
-    static void DoWork(object state)
+    static void DoWork()
     {
-        Console.WriteLine("ThreadPool thread is doing some work.");
+        for (int i = 0; i < 10; i++)
+        {
+            Console.WriteLine("Task is working: " + i);
+            Task.Delay(100).Wait(); // 작업을 시뮬레이트
+        }
     }
 }
