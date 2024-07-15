@@ -3,35 +3,30 @@ using System.Threading;
 
 class Program
 {
-    private static object _lock = new object();
+    private static readonly object _lockObject = new object();
     private static int _counter = 0;
 
     static void Main()
     {
-        Thread t1 = new Thread(IncrementCounter);
-        Thread t2 = new Thread(IncrementCounter);
+        Thread thread1 = new Thread(IncrementCounter);
+        Thread thread2 = new Thread(IncrementCounter);
 
-        t1.Start();
-        t2.Start();
+        thread1.Start();
+        thread2.Start();
 
-        t1.Join();
-        t2.Join();
+        thread1.Join();
+        thread2.Join();
 
-        Console.WriteLine($"Final counter value: {_counter}");
+        Console.WriteLine("최종 카운터 값: " + _counter);
     }
 
-    static void IncrementCounter()
+    private static void IncrementCounter()
     {
-        for (int i = 0; i < 1000000; i++)
+        for (int i = 0; i < 1000; i++)
         {
-            Monitor.Enter(_lock);
-            try
+            lock (_lockObject)
             {
                 _counter++;
-            }
-            finally
-            {
-                Monitor.Exit(_lock);
             }
         }
     }
