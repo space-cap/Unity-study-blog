@@ -3,7 +3,7 @@ using System.Threading;
 
 class Program
 {
-    private static readonly object _lockObject = new object();
+    private static SpinLock _spinLock = new SpinLock();
     private static int _counter = 0;
 
     static void Main()
@@ -24,9 +24,18 @@ class Program
     {
         for (int i = 0; i < 1000; i++)
         {
-            lock (_lockObject)
+            bool lockTaken = false;
+            try
             {
+                _spinLock.Enter(ref lockTaken);
                 _counter++;
+            }
+            finally
+            {
+                if (lockTaken)
+                {
+                    _spinLock.Exit();
+                }
             }
         }
     }
