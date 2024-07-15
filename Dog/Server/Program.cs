@@ -3,12 +3,13 @@ using System.Threading;
 
 class Program
 {
-    private static int counter = 0;
+    private static object _lock = new object();
+    private static int _counter = 0;
 
     static void Main()
     {
         Thread t1 = new Thread(IncrementCounter);
-        Thread t2 = new Thread(DecrementCounter);
+        Thread t2 = new Thread(IncrementCounter);
 
         t1.Start();
         t2.Start();
@@ -16,22 +17,22 @@ class Program
         t1.Join();
         t2.Join();
 
-        Console.WriteLine($"Final counter value: {counter}");
+        Console.WriteLine($"Final counter value: {_counter}");
     }
 
     static void IncrementCounter()
     {
-        for (int i = 0; i < 1000; i++)
+        for (int i = 0; i < 1000000; i++)
         {
-            Interlocked.Increment(ref counter);
-        }
-    }
-
-    static void DecrementCounter()
-    {
-        for (int i = 0; i < 1000; i++)
-        {
-            Interlocked.Decrement(ref counter);
+            Monitor.Enter(_lock);
+            try
+            {
+                _counter++;
+            }
+            finally
+            {
+                Monitor.Exit(_lock);
+            }
         }
     }
 }
