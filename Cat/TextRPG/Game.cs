@@ -16,14 +16,14 @@ namespace TextRPG
 
     class Game
     {
-        private GameMode mode = GameMode.Lobby;
-        private Player player = null;
-        private Monster monster = null;
-        Random random = new Random();
+        private GameMode _mode = GameMode.Lobby;
+        private Player? _player = null;
+        private Monster? _monster = null;
+        private readonly Random _random = new Random();
 
         public void Process()
         {
-            switch (mode)
+            switch (_mode)
             {
                 case GameMode.Lobby:
                     ProcessLobby();
@@ -48,19 +48,19 @@ namespace TextRPG
             switch (input)
             {
                 case "1":
-                    player = new Knight();
+                    _player = new Knight();
                     Console.WriteLine("기사를 선택했습니다.");
-                    mode = GameMode.Town;
+                    _mode = GameMode.Town;
                     break;
                 case "2":
-                    player = new Archer();
+                    _player = new Archer();
                     Console.WriteLine("궁수를 선택했습니다.");
-                    mode = GameMode.Town;
+                    _mode = GameMode.Town;
                     break;
                 case "3":
-                    player = new Mage();
+                    _player = new Mage();
                     Console.WriteLine("법사를 선택했습니다.");
-                    mode = GameMode.Town;
+                    _mode = GameMode.Town;
                     break;
             }
         }
@@ -74,10 +74,10 @@ namespace TextRPG
             switch (input)
             {
                 case "1":
-                    mode = GameMode.Field;
+                    _mode = GameMode.Field;
                     break;
                 case "2":
-                    mode = GameMode.Lobby;
+                    _mode = GameMode.Lobby;
                     break;
             }
         }
@@ -96,31 +96,37 @@ namespace TextRPG
                     ProcessFight();
                     break;
                 case "2":
-                    mode = GameMode.Town;
+                    _mode = GameMode.Town;
                     break;
             }
         }
 
         private void ProcessFight()
         {
+            if (_player == null || _monster == null)
+            {
+                _mode = GameMode.Lobby;
+                return;
+            }
+
             while (true)
             {
-                int damage = player.GetAttack();
-                monster.OnDamaged(damage);
-                if (monster.IsDead())
+                int damage = _player.GetAttack();
+                _monster.OnDamaged(damage);
+                if (_monster.IsDead())
                 {
                     Console.WriteLine("승리");
-                    Console.WriteLine($"남은 체력{player.GetHp()}");
-                    mode = GameMode.Lobby;
+                    Console.WriteLine($"남은 체력{_player.GetHp()}");
+                    _mode = GameMode.Lobby;
                     break;
                 }
 
-                damage = monster.GetAttack();
-                player.OnDamaged(damage);
-                if (player.IsDead())
+                damage = _monster.GetAttack();
+                _player.OnDamaged(damage);
+                if (_player.IsDead())
                 {
                     Console.WriteLine("패배");
-                    mode = GameMode.Lobby;
+                    _mode = GameMode.Lobby;
                     break;
                 }
             }
@@ -128,19 +134,19 @@ namespace TextRPG
 
         private void CreateRandMonster()
         {
-            int randValue = random.Next(0, 3);
+            int randValue = _random.Next(0, 3);
             switch (randValue)
             {
                 case 0:
-                    monster = new Slime();
+                    _monster = new Slime();
                     Console.WriteLine("슬라임 생성");
                     break;
                 case 1:
-                    monster = new Orc();
+                    _monster = new Orc();
                     Console.WriteLine("오크 생성");
                     break;
                 case 2:
-                    monster = new Skeleton();
+                    _monster = new Skeleton();
                     Console.WriteLine("스켈레톤 생성");
                     break;
             }
