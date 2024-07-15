@@ -1,6 +1,32 @@
 ﻿using System;
 using System.Threading;
 
+public class SpinLock
+{
+    private int _lockFlag = 0;
+
+    public void Enter()
+    {
+        while (true)
+        {
+            // 락을 획득하려고 시도
+            if (Interlocked.Exchange(ref _lockFlag, 1) == 0)
+            {
+                return; // 락 획득 성공
+            }
+
+            // 잠시 대기하여 CPU를 양보
+            Thread.SpinWait(1);
+        }
+    }
+
+    public void Exit()
+    {
+        // 락 해제
+        Volatile.Write(ref _lockFlag, 0);
+    }
+}
+
 class Program
 {
     private static SpinLock _spinLock = new SpinLock();
@@ -24,18 +50,14 @@ class Program
     {
         for (int i = 0; i < 1000; i++)
         {
-            bool lockTaken = false;
+            _spinLock.Enter();
             try
             {
-                _spinLock.Enter(ref lockTaken);
                 _counter++;
             }
             finally
             {
-                if (lockTaken)
-                {
-                    _spinLock.Exit();
-                }
+                _spinLock.Exit();
             }
         }
     }
