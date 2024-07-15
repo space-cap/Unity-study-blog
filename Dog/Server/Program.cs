@@ -1,44 +1,36 @@
-﻿namespace Server
+﻿using System;
+using System.Threading;
+
+class Program
 {
-    internal class Program
+    private static int _x = 0;
+    private static int _y = 0;
+
+    static void Main()
     {
-        static void Main(string[] args)
-        {
+        Thread t1 = new Thread(Thread1);
+        Thread t2 = new Thread(Thread2);
 
-            int[,] arr = new int[10000,10000];
+        t1.Start();
+        t2.Start();
 
-            {
-                long now = DateTime.Now.Ticks;
-                for (int y = 0; y < 10000; y++)
-                {
-                    for (int x = 0; x < 10000; x++)
-                    {
-                        arr[y, x] = 1;
-                    }
-                }
+        t1.Join();
+        t2.Join();
 
-                long end = DateTime.Now.Ticks;
-                Console.WriteLine($"(y,x)순서 걸린 시간 {end - now}");
-            }
+        Console.WriteLine($"x: {_x}, y: {_y}");
+    }
 
+    static void Thread1()
+    {
+        _x = 1; // Write to _x
+        Thread.MemoryBarrier(); // Insert a memory barrier
+        _y = 1; // Write to _y
+    }
 
-            {
-                long now = DateTime.Now.Ticks;
-                for (int x = 0; x < 10000; x++)
-                {
-                    for (int y = 0; y < 10000; y++)
-                    {
-                        arr[x, y] = 1;
-                    }
-                }
-
-                long end = DateTime.Now.Ticks;
-                Console.WriteLine($"(x,y)순서 걸린 시간 {end - now}");
-            }
-
-
-
-            Console.WriteLine("Hello, World!");
-        }
+    static void Thread2()
+    {
+        while (_y != 1) ; // Wait until _y is set to 1
+        Thread.MemoryBarrier(); // Insert a memory barrier
+        Console.WriteLine(_x); // Read _x
     }
 }
