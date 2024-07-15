@@ -3,31 +3,17 @@ using System.Threading;
 
 class Program
 {
-    private static object _lock = new object();
-    private static int _counter = 0;
-
     static void Main()
     {
-        Thread t1 = new Thread(IncrementCounter);
-        Thread t2 = new Thread(IncrementCounter);
+        ThreadPool.QueueUserWorkItem(new WaitCallback(DoWork));
 
-        t1.Start();
-        t2.Start();
-
-        t1.Join();
-        t2.Join();
-
-        Console.WriteLine("Counter: " + _counter);
+        // 메인 쓰레드에서 다른 작업 수행
+        Console.WriteLine("Main thread is doing some work.");
+        Thread.Sleep(1000); // ThreadPool 쓰레드가 완료될 시간을 줌
     }
 
-    static void IncrementCounter()
+    static void DoWork(object state)
     {
-        for (int i = 0; i < 1000; i++)
-        {
-            lock (_lock)
-            {
-                _counter++;
-            }
-        }
+        Console.WriteLine("ThreadPool thread is doing some work.");
     }
 }
