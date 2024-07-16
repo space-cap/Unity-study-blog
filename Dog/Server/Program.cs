@@ -1,10 +1,20 @@
-﻿namespace DummyClient
+﻿namespace Server
 {
-    internal class Program
+    class Program
     {
+        static ThreadLocal<string> threadName = new ThreadLocal<string>();
+
+        static void WhoAmI()
+        {
+            threadName.Value = $"my name is {Thread.CurrentThread.ManagedThreadId}";
+
+            Thread.Sleep(1000);
+            Console.WriteLine(threadName.Value);
+        }
         static void Main(string[] args)
         {
-            Console.WriteLine("Hello, World!");
+            Parallel.Invoke(WhoAmI, WhoAmI, WhoAmI, WhoAmI, WhoAmI);
+
         }
     }
 }
