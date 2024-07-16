@@ -1,35 +1,65 @@
 ﻿using System;
 using System.Threading;
 
-class MutexExample
+class ReaderWriterLockSlimExample
 {
-    private static Mutex mutex = new Mutex();
+    private static ReaderWriterLockSlim rwLockSlim = new ReaderWriterLockSlim();
+    private static int sharedResource = 0;
 
     static void Main()
     {
-        for (int i = 1; i <= 3; i++)
+        Thread writerThread = new Thread(Writer);
+        writerThread.Name = "Writer";
+
+        Thread[] readerThreads = new Thread[3];
+        for (int i = 0; i < readerThreads.Length; i++)
         {
-            Thread thread = new Thread(Worker);
-            thread.Name = $"스레드 {i}";
-            thread.Start();
+            readerThreads[i] = new Thread(Reader);
+            readerThreads[i].Name = $"Reader {i + 1}";
+        }
+
+        writerThread.Start();
+        foreach (var reader in readerThreads)
+        {
+            reader.Start();
         }
     }
 
-    static void Worker()
+    static void Writer()
     {
-        Console.WriteLine($"{Thread.CurrentThread.Name}가 Mutex를 기다립니다...");
-        mutex.WaitOne();  // Mutex 소유를 시도합니다
-        try
+        for (int i = 0; i < 5; i++)
         {
-            Console.WriteLine($"{Thread.CurrentThread.Name}가 Mutex를 소유합니다.");
-            // 공유 자원 접근 (여기서는 콘솔 출력)
-            Thread.Sleep(2000);  // 작업을 시뮬레이션
-            Console.WriteLine($"{Thread.CurrentThread.Name}가 작업을 완료했습니다.");
+            rwLockSlim.EnterWriteLock();
+            try
+            {
+                Console.WriteLine($"{Thread.CurrentThread.Name} is writing...");
+                sharedResource++;
+                Thread.Sleep(1000);  // Simulate write operation
+                Console.WriteLine($"{Thread.CurrentThread.Name} updated sharedResource to {sharedResource}");
+            }
+            finally
+            {
+                rwLockSlim.ExitWriteLock();
+            }
+            Thread.Sleep(500);  // Simulate time between writes
         }
-        finally
+    }
+
+    static void Reader()
+    {
+        for (int i = 0; i < 5; i++)
         {
-            Console.WriteLine($"{Thread.CurrentThread.Name}가 Mutex를 해제합니다.");
-            mutex.ReleaseMutex();  // Mutex 해제
+            rwLockSlim.EnterReadLock();
+            try
+            {
+                Console.WriteLine($"{Thread.CurrentThread.Name} is reading sharedResource: {sharedResource}");
+                Thread.Sleep(500);  // Simulate read operation
+            }
+            finally
+            {
+                rwLockSlim.ExitReadLock();
+            }
+            Thread.Sleep(500);  // Simulate time between reads
         }
     }
 }
