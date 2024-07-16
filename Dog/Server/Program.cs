@@ -1,64 +1,38 @@
 ﻿using System;
 using System.Threading;
 
-public class SpinLock
+class ManualResetEventExample
 {
-    private int _lockFlag = 0;
-
-    public void Enter()
-    {
-        while (true)
-        {
-            // 락을 획득하려고 시도
-            if (Interlocked.Exchange(ref _lockFlag, 1) == 0)
-            {
-                return; // 락 획득 성공
-            }
-
-            // 잠시 대기하여 CPU를 양보
-            Thread.SpinWait(1);
-        }
-    }
-
-    public void Exit()
-    {
-        // 락 해제
-        Volatile.Write(ref _lockFlag, 0);
-    }
-}
-
-class Program
-{
-    private static SpinLock _spinLock = new SpinLock();
-    private static int _counter = 0;
+    private static ManualResetEvent manualResetEvent = new ManualResetEvent(false);
 
     static void Main()
     {
-        Thread thread1 = new Thread(IncrementCounter);
-        Thread thread2 = new Thread(IncrementCounter);
+        Console.WriteLine("메인 스레드가 작업자 스레드를 시작합니다...");
 
-        thread1.Start();
-        thread2.Start();
+        for (int i = 1; i <= 3; i++)
+        {
+            Thread workerThread = new Thread(Worker);
+            workerThread.Name = $"작업자 {i}";
+            workerThread.Start();
+        }
 
-        thread1.Join();
-        thread2.Join();
+        Console.WriteLine("메인 스레드가 작업을 수행한 후 이벤트를 신호로 설정합니다...");
+        Thread.Sleep(2000);  // 작업을 시뮬레이션
+        manualResetEvent.Set();
 
-        Console.WriteLine("최종 카운터 값: " + _counter);
+        Console.WriteLine("메인 스레드가 이벤트를 설정했습니다. 작업자 스레드가 진행합니다...");
+
+        // 미래 사용을 위해 이벤트를 비신호 상태로 재설정
+        manualResetEvent.Reset();
+
+        Console.WriteLine("메인 스레드가 다른 작업을 수행한 후 종료합니다...");
+        Thread.Sleep(2000);  // 더 많은 작업을 시뮬레이션
     }
 
-    private static void IncrementCounter()
+    static void Worker()
     {
-        for (int i = 0; i < 1000; i++)
-        {
-            _spinLock.Enter();
-            try
-            {
-                _counter++;
-            }
-            finally
-            {
-                _spinLock.Exit();
-            }
-        }
+        Console.WriteLine($"{Thread.CurrentThread.Name}이(가) 이벤트가 신호로 설정되기를 기다리고 있습니다...");
+        manualResetEvent.WaitOne();  // 이벤트가 신호로 설정되기를 기다림
+        Console.WriteLine($"{Thread.CurrentThread.Name}이(가) 신호를 받고 작업을 계속합니다...");
     }
 }
