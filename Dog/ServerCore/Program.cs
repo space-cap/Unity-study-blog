@@ -12,19 +12,16 @@ namespace ServerCore
         {
             try
             {
-                // 받는다.
-                byte[] recvBuffer = new byte[1024];
-                int recvBytes = clientSocket.Receive(recvBuffer);
-                string recvData = Encoding.UTF8.GetString(recvBuffer, 0, recvBytes);
-                Console.WriteLine($"[from client] {recvData}");
+                Session session = new Session();
+                session.Start(clientSocket);
 
                 // 보낸다.
                 byte[] sendBuffer = Encoding.UTF8.GetBytes("welcome to mmorpg server!");
-                clientSocket.Send(sendBuffer);
+                session.Send(sendBuffer);
 
-                // 쫓아낸다.
-                clientSocket.Shutdown(SocketShutdown.Both);
-                clientSocket.Close();
+                Thread.Sleep(1000);
+
+                session.Disconnect();
             }
             catch (Exception e)
             {

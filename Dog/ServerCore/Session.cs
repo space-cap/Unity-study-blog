@@ -10,8 +10,9 @@ namespace ServerCore
     class Session
     {
         private Socket _socket;
+        int _disconnected = 0;
 
-        public void Init(Socket socket)
+        public void Start(Socket socket)
         {
             _socket = socket;
             SocketAsyncEventArgs recvArgs = new SocketAsyncEventArgs();
@@ -21,13 +22,16 @@ namespace ServerCore
             RegisterRecv(recvArgs);
         }
 
-        void Send(byte[] sendBuffer)
+        public void Send(byte[] sendBuffer)
         {
             _socket.Send(sendBuffer);
         }
 
-        void Disconnect()
+        public void Disconnect()
         {
+            if (Interlocked.Exchange(ref _disconnected, 1) == 1)
+                return;
+
             _socket.Shutdown(SocketShutdown.Both);
             _socket.Close();
         }
