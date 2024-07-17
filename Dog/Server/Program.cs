@@ -1,33 +1,65 @@
 ﻿using System;
+using System.Net;
+using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 
-class ThreadLocalExample
+class TcpServer
 {
-    // ThreadLocal 인스턴스 초기화
-    private static ThreadLocal<int> threadLocalData = new ThreadLocal<int>(() =>
+    static void Main(string[] args)
     {
-        // 각 스레드가 처음 접근할 때 초기 값 설정
-        return Thread.CurrentThread.ManagedThreadId;
-    });
-
-    static void Main()
-    {
-        // 여러 스레드 생성 및 시작
-        for (int i = 0; i < 5; i++)
+        TcpListener server = null;
+        try
         {
-            Thread thread = new Thread(Worker);
-            thread.Name = $"Thread {i + 1}";
-            thread.Start();
+            int port = 13000;
+            IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+
+            server = new TcpListener(localAddr, port);
+            server.Start();
+            Console.WriteLine("서버가 시작되었습니다...");
+
+            while (true)
+            {
+                Console.WriteLine("연결을 기다리는 중...");
+
+                TcpClient client = server.AcceptTcpClient();
+                Console.WriteLine("연결됨!");
+
+                Thread clientThread = new Thread(() => HandleClient(client));
+                clientThread.Start();
+            }
         }
+        catch (SocketException e)
+        {
+            Console.WriteLine("SocketException: {0}", e);
+        }
+        finally
+        {
+            server.Stop();
+        }
+
+        Console.WriteLine("\n계속하려면 Enter 키를 누르세요...");
+        Console.Read();
     }
 
-    static void Worker()
+    static void HandleClient(TcpClient client)
     {
-        // 스레드 로컬 데이터에 접근
-        Console.WriteLine($"{Thread.CurrentThread.Name} has ThreadLocal data: {threadLocalData.Value}");
-        Thread.Sleep(1000);  // 작업 시뮬레이션
-        // 스레드 로컬 데이터 변경
-        threadLocalData.Value += 100;
-        Console.WriteLine($"{Thread.CurrentThread.Name} updated ThreadLocal data to: {threadLocalData.Value}");
+        byte[] bytes = new byte[256];
+        string data = null;
+
+        NetworkStream stream = client.GetStream();
+
+        int i;
+        while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+        {
+            data = Encoding.ASCII.GetString(bytes, 0, i);
+            Console.WriteLine("받은 데이터: {0}", data);
+
+            byte[] msg = Encoding.ASCII.GetBytes(data.ToUpper());
+            stream.Write(msg, 0, msg.Length);
+            Console.WriteLine("보낸 데이터: {0}", data.ToUpper());
+        }
+
+        client.Close();
     }
 }
