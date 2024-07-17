@@ -1,42 +1,48 @@
-﻿using System;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
 
-class TcpClientExample
+namespace DummyClient
 {
-    static void Main(string[] args)
+    internal class Program
     {
-        try
+        static void Main(string[] args)
         {
-            int port = 13000;
-            TcpClient client = new TcpClient("127.0.0.1", port);
+            // DNS(domain name system)
+            string host = Dns.GetHostName();
+            IPHostEntry ipHost = Dns.GetHostEntry(host);
+            IPAddress ipAddr = ipHost.AddressList[0];
+            IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
 
-            NetworkStream stream = client.GetStream();
+            // 휴대폰 설정
+            Socket socket = new Socket(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
 
-            string message = "Hello, Server!";
-            byte[] data = Encoding.ASCII.GetBytes(message);
+            try
+            {
+                // 문지기에게 입장 문의.
+                socket.Connect(endPoint);
+                Console.WriteLine($"connected to {socket.RemoteEndPoint.ToString()}");
 
-            stream.Write(data, 0, data.Length);
-            Console.WriteLine("보낸 데이터: {0}", message);
+                // 보낸다.
+                byte[] sendBuffer = Encoding.UTF8.GetBytes("hello world!");
+                int sendBytes = socket.Send(sendBuffer);
 
-            data = new byte[256];
-            int bytes = stream.Read(data, 0, data.Length);
-            string responseData = Encoding.ASCII.GetString(data, 0, bytes);
-            Console.WriteLine("받은 데이터: {0}", responseData);
+                // 받는다.
+                byte[] recvBuffer = new byte[1024];
+                int recvBytes = socket.Receive(recvBuffer);
+                string recvData = Encoding.UTF8.GetString(recvBuffer, 0, recvBytes);
+                Console.WriteLine($"[from server] {recvData}");
 
-            stream.Close();
-            client.Close();
+                // 나간다.
+                socket.Shutdown(SocketShutdown.Both);
+                socket.Close();
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e.ToString());
+                throw;
+            }
+
         }
-        catch (ArgumentNullException e)
-        {
-            Console.WriteLine("ArgumentNullException: {0}", e);
-        }
-        catch (SocketException e)
-        {
-            Console.WriteLine("SocketException: {0}", e);
-        }
-
-        Console.WriteLine("\n계속하려면 Enter 키를 누르세요...");
-        Console.Read();
     }
 }
