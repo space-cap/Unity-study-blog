@@ -1,4 +1,8 @@
-﻿namespace Server
+﻿using ServerCore;
+
+
+
+namespace Server
 {
     internal class Program
     {

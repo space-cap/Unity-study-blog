@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ServerCore
 {
-    class Session
+    public class Session
     {
         private Socket _socket;
         int _disconnected = 0;
