@@ -1,65 +1,52 @@
-﻿using System;
-using System.Net;
+﻿using System.Net;
 using System.Net.Sockets;
 using System.Text;
-using System.Threading;
 
-class TcpServer
+namespace Server
 {
-    static void Main(string[] args)
+    class Program
     {
-        TcpListener server = null;
-        try
+        static void Main(string[] args)
         {
-            int port = 13000;
-            IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+            // DNS(domain name system)
+            string host = Dns.GetHostName();
+            IPHostEntry ipHost = Dns.GetHostEntry(host);
+            IPAddress ipAddr = ipHost.AddressList[0];
+            IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
 
-            server = new TcpListener(localAddr, port);
-            server.Start();
-            Console.WriteLine("서버가 시작되었습니다...");
+            // 문지기
+            Socket listenSocket = new Socket(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+
+            // 문지기 교육
+            listenSocket.Bind(endPoint);
+
+            // 영업 시작
+            // backlog : 최대 대기수
+            listenSocket.Listen(10);
 
             while (true)
             {
-                Console.WriteLine("연결을 기다리는 중...");
+                Console.WriteLine("listening...");
 
-                TcpClient client = server.AcceptTcpClient();
-                Console.WriteLine("연결됨!");
+                // 손님을 입장시킨다.
+                Socket clientSocket = listenSocket.Accept();
 
-                Thread clientThread = new Thread(() => HandleClient(client));
-                clientThread.Start();
+                // 받는다.
+                byte[] recvBuffer = new byte[1024];
+                int recvBytes = clientSocket.Receive(recvBuffer);
+                string recvData = Encoding.UTF8.GetString(recvBuffer, 0, recvBytes);
+                Console.WriteLine($"[from client] {recvData}");
+
+                // 보낸다.
+                byte[] sendBuffer = Encoding.UTF8.GetBytes("welcome to mmorpg server!");
+                clientSocket.Send(sendBuffer);
+
+                // 쫓아낸다.
+                clientSocket.Shutdown(SocketShutdown.Both);
+                clientSocket.Close();
+
             }
+
         }
-        catch (SocketException e)
-        {
-            Console.WriteLine("SocketException: {0}", e);
-        }
-        finally
-        {
-            server.Stop();
-        }
-
-        Console.WriteLine("\n계속하려면 Enter 키를 누르세요...");
-        Console.Read();
-    }
-
-    static void HandleClient(TcpClient client)
-    {
-        byte[] bytes = new byte[256];
-        string data = null;
-
-        NetworkStream stream = client.GetStream();
-
-        int i;
-        while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
-        {
-            data = Encoding.ASCII.GetString(bytes, 0, i);
-            Console.WriteLine("받은 데이터: {0}", data);
-
-            byte[] msg = Encoding.ASCII.GetBytes(data.ToUpper());
-            stream.Write(msg, 0, msg.Length);
-            Console.WriteLine("보낸 데이터: {0}", data.ToUpper());
-        }
-
-        client.Close();
     }
 }
