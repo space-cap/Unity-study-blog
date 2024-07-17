@@ -65,8 +65,7 @@ namespace ServerCore
             }
             else
             {
-                // todo
-                // disconnection
+                Disconnect();
             }
         }
     }
