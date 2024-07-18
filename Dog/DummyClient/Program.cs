@@ -1,48 +1,38 @@
-﻿using System.Net;
+﻿using ServerCore;
+using System;
+using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading;
 
 namespace DummyClient
 {
-    internal class Program
+    class Program
     {
         static void Main(string[] args)
         {
-            // DNS(domain name system)
+            // DNS (Domain Name System)
             string host = Dns.GetHostName();
             IPHostEntry ipHost = Dns.GetHostEntry(host);
             IPAddress ipAddr = ipHost.AddressList[0];
             IPEndPoint endPoint = new IPEndPoint(ipAddr, 7777);
 
-            // 휴대폰 설정
-            Socket socket = new Socket(ipAddr.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+            Connector connector = new Connector();
 
-            try
+            connector.Connect(endPoint, () => { return new ServerSession(); });
+
+            while (true)
             {
-                // 문지기에게 입장 문의.
-                socket.Connect(endPoint);
-                Console.WriteLine($"connected to {socket.RemoteEndPoint.ToString()}");
+                try
+                {
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.ToString());
+                }
 
-                // 보낸다.
-                byte[] sendBuffer = Encoding.UTF8.GetBytes("hello world!");
-                int sendBytes = socket.Send(sendBuffer);
-
-                // 받는다.
-                byte[] recvBuffer = new byte[1024];
-                int recvBytes = socket.Receive(recvBuffer);
-                string recvData = Encoding.UTF8.GetString(recvBuffer, 0, recvBytes);
-                Console.WriteLine($"[from server] {recvData}");
-
-                // 나간다.
-                socket.Shutdown(SocketShutdown.Both);
-                socket.Close();
+                Thread.Sleep(100);
             }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
-                throw;
-            }
-
         }
     }
 }
