@@ -7,6 +7,7 @@
             Board board = new Board();
             Player player = new Player();
             board.Initialize(25, player);
+            player.Initialize(1, 1, board);
 
             Console.CursorVisible = false;
             const int WAIT_TICK = 1000 / 30;
@@ -28,6 +29,7 @@
                 // 입력
 
                 // 로직
+                player.Update(deltaTick);
 
                 // 랜드링
                 Console.SetCursorPosition(0, 0);
