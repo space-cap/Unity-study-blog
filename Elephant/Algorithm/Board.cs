@@ -13,13 +13,15 @@ namespace Algorithm
         public TileType[,] Tile { get; private set; }
         public int Size { get; private set; }
 
+        Player _player;
+
         public enum TileType
         {
             Empty,
             Wall,
         }
 
-        public void Initialize(int size)
+        public void Initialize(int size, Player player)
         {
             if (size % 2 == 0)
             {
@@ -28,6 +30,7 @@ namespace Algorithm
 
             Tile = new TileType[size, size];
             Size = size;
+            _player = player;
 
             //GenerateByBinaryTree();
             GenerateBySideWinder();
@@ -146,7 +149,16 @@ namespace Algorithm
             {
                 for (int x = 0; x < Size; x++)
                 {
-                    Console.ForegroundColor = GetTileColor(Tile[y,x]);
+                    // 플레이어 좌표를 갖고 와서, 그 좌표랑 현재 y, x가 일치하면 플레이어 전용 색상으로 표시.
+                    if (y == _player.PosY && x == _player.PosX)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Blue;
+                    }
+                    else
+                    {
+                        Console.ForegroundColor = GetTileColor(Tile[y, x]);
+                    }
+                    
                     Console.Write(CIRCLE);
                 }
                 Console.WriteLine();

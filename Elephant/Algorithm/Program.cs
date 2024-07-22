@@ -5,7 +5,8 @@
         static void Main(string[] args)
         {
             Board board = new Board();
-            board.Initialize(25);
+            Player player = new Player();
+            board.Initialize(25, player);
 
             Console.CursorVisible = false;
             const int WAIT_TICK = 1000 / 30;
