@@ -29,6 +29,13 @@ namespace Algorithm
             Tile = new TileType[size, size];
             Size = size;
 
+            GenerateByBinaryTree();
+        }
+
+
+        void GenerateByBinaryTree()
+        {
+            // 일단 길을 다 막아버리는 작업
             for (int y = 0; y < Size; y++)
             {
                 for (int x = 0; x < Size; x++)
@@ -40,12 +47,10 @@ namespace Algorithm
                 }
             }
 
-
             // 랜덤으로 우측 혹은 아래로 길을 뚫는 작업
             Random rand = new Random();
             for (int y = 0; y < Size; y++)
             {
-                int count = 1;
                 for (int x = 0; x < Size; x++)
                 {
                     if (x % 2 == 0 || y % 2 == 0)
@@ -77,6 +82,7 @@ namespace Algorithm
                 }
             }
         }
+
 
         public void Render()
         {
