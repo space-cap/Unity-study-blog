@@ -1,17 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace Algorithm
 {
-    public class Board
+    class Board
     {
         const char CIRCLE = '\u25cf';
         public TileType[,] Tile { get; private set; }
         public int Size { get; private set; }
+
+        public int DestY { get; private set; }
+        public int DestX { get; private set; }
 
         Player _player;
 
@@ -24,14 +24,17 @@ namespace Algorithm
         public void Initialize(int size, Player player)
         {
             if (size % 2 == 0)
-            {
                 return;
-            }
+
+            _player = player;
 
             Tile = new TileType[size, size];
             Size = size;
-            _player = player;
 
+            DestY = Size - 2;
+            DestX = Size - 2;
+
+            // Mazes for Programmers
             //GenerateByBinaryTree();
             GenerateBySideWinder();
         }
@@ -50,7 +53,7 @@ namespace Algorithm
                 }
             }
 
-            
+            // 랜덤으로 우측 혹은 아래로 길을 뚫는 작업
             Random rand = new Random();
             for (int y = 0; y < Size; y++)
             {
@@ -140,7 +143,6 @@ namespace Algorithm
             }
         }
 
-
         public void Render()
         {
             ConsoleColor prevColor = Console.ForegroundColor;
@@ -151,14 +153,12 @@ namespace Algorithm
                 {
                     // 플레이어 좌표를 갖고 와서, 그 좌표랑 현재 y, x가 일치하면 플레이어 전용 색상으로 표시.
                     if (y == _player.PosY && x == _player.PosX)
-                    {
                         Console.ForegroundColor = ConsoleColor.Blue;
-                    }
+                    else if (y == DestY && x == DestX)
+                        Console.ForegroundColor = ConsoleColor.Yellow;
                     else
-                    {
                         Console.ForegroundColor = GetTileColor(Tile[y, x]);
-                    }
-                    
+
                     Console.Write(CIRCLE);
                 }
                 Console.WriteLine();
