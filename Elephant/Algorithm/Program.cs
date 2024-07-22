@@ -6,6 +6,7 @@
         {
             Console.CursorVisible = false;
             const int WAIT_TICK = 1000 / 30;
+            const char CIRCLE = '\u25cf';
 
             int lastTick = 0;
             while (true)
@@ -25,7 +26,17 @@
 
                 // 랜드링
                 Console.SetCursorPosition(0, 0);
-                Console.WriteLine("Hello, World!");
+
+                for (int i = 0; i < 25; i++)
+                {
+                    for (int j = 0; j < 25; j++)
+                    {
+                        Console.ForegroundColor = ConsoleColor.Green;
+                        Console.Write(CIRCLE);
+                    }
+                    Console.WriteLine();
+                }
+
             }
             
         }
