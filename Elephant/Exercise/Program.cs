@@ -1,4 +1,6 @@
-﻿namespace Exercise
+﻿using System.ComponentModel;
+
+namespace Exercise
 {
     class Graph
     {
@@ -26,10 +28,14 @@
         public void BFS(int start)
         {
             bool[] found = new bool[6];
+            int[] parent = new int[6];
+            int[] distance = new int[6];
 
             Queue<int> q = new Queue<int>();
             q.Enqueue(start);
             found[start] = true;
+            parent[start] = start;
+            distance[start] = 0;
 
             while (q.Count > 0)
             {
@@ -50,6 +56,8 @@
 
                     q.Enqueue(next);
                     found[next] = true;
+                    parent[next] = now;
+                    distance[next] = distance[now] + 1;
                 }
             }
         }
