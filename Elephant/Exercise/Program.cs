@@ -47,6 +47,23 @@
                 DFS(next);
             }
         }
+
+
+        public void DFS2(int now)
+        {
+            Console.WriteLine(now);
+            visited[now] = true;
+
+            foreach (int next in adj2[now])
+            {
+                if (visited[next])
+                {
+                    continue;
+                }
+
+                DFS2(next);
+            }
+        }
     }
 
 
@@ -58,7 +75,7 @@
             // BFS(Breadth First Search 너비 우선 탐색)
 
             Graph graph = new Graph();
-            graph.DFS(3);
+            graph.DFS2(3);
         }
     }
 }
