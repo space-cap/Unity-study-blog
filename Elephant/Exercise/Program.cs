@@ -7,8 +7,8 @@
             {0, 1, 0, 1, 0, 0},
             {1, 0, 1, 1, 0, 0},
             {0, 1, 0, 0, 0, 0},
-            {1, 1, 0, 0, 0, 0},
-            {0, 0, 0, 0, 0, 1},
+            {1, 1, 0, 0, 1, 0},
+            {0, 0, 0, 1, 0, 1},
             {0, 0, 0, 0, 1, 0},
         };
 
@@ -17,66 +17,45 @@
             new List<int>() {1, 2},
             new List<int>() {0, 2, 3},
             new List<int>() {1},
-            new List<int>() {0, 1},
-            new List<int>() {5},
+            new List<int>() {0, 1,4},
+            new List<int>() {3,5},
             new List<int>() {4},
         };
 
-        bool[] visited = new bool[6];
 
-        public void DFS(int now)
+        public void BFS(int start)
         {
-            Console.WriteLine(now);
-            visited[now] = true;
+            bool[] found = new bool[6];
 
-            // 1. 우선 now부터 방문하고
-            // 2. now와 연결된 정점들을 하나씩 확인해서, 아직 미발견(미방문) 상태라면 방문한다.
-            // adj.GetLength(0)
-            for (int next = 0; next < adj.GetLength(0); next++)
+            Queue<int> q = new Queue<int>();
+            q.Enqueue(start);
+            found[start] = true;
+
+            while (q.Count > 0)
             {
-                if (adj[now, next] == 0)
-                {
-                    continue;
-                }
+                int now = q.Dequeue();
+                Console.WriteLine(now);
 
-                if (visited[next])
+                for (int next = 0; next < 6; next++)
                 {
-                    continue;
-                }
+                    if (adj[now, next] == 0)
+                    {
+                        continue;
+                    }
 
-                DFS(next);
+                    if (found[next])
+                    {
+                        continue;
+                    }
+
+                    q.Enqueue(next);
+                    found[next] = true;
+                }
             }
         }
 
 
-        public void DFS2(int now)
-        {
-            Console.WriteLine(now);
-            visited[now] = true;
 
-            foreach (int next in adj2[now])
-            {
-                if (visited[next])
-                {
-                    continue;
-                }
-
-                DFS2(next);
-            }
-        }
-
-
-        public void SearchAll()
-        {
-            visited = new bool[6];
-            for (int now = 0; now < 6; now++)
-            {
-                if (visited[now] == false)
-                {
-                    DFS(now);
-                }
-            }
-        }
     }
 
 
@@ -88,7 +67,7 @@
             // BFS(Breadth First Search 너비 우선 탐색)
 
             Graph graph = new Graph();
-            graph.DFS2(3);
+            graph.BFS(0);
         }
     }
 }
