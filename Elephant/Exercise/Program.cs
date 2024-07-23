@@ -7,8 +7,8 @@
             {0, 1, 0, 1, 0, 0},
             {1, 0, 1, 1, 0, 0},
             {0, 1, 0, 0, 0, 0},
-            {1, 1, 0, 0, 1, 0},
-            {0, 0, 0, 1, 0, 1},
+            {1, 1, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 1},
             {0, 0, 0, 0, 1, 0},
         };
 
@@ -17,8 +17,8 @@
             new List<int>() {1, 2},
             new List<int>() {0, 2, 3},
             new List<int>() {1},
-            new List<int>() {0, 1, 4,},
-            new List<int>() {3, 5},
+            new List<int>() {0, 1},
+            new List<int>() {5},
             new List<int>() {4},
         };
 
@@ -62,6 +62,19 @@
                 }
 
                 DFS2(next);
+            }
+        }
+
+
+        public void SearchAll()
+        {
+            visited = new bool[6];
+            for (int now = 0; now < 6; now++)
+            {
+                if (visited[now] == false)
+                {
+                    DFS(now);
+                }
             }
         }
     }
