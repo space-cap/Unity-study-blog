@@ -126,7 +126,7 @@ namespace Algorithm
             }
         }
 
-        const int MOVE_TICK = 100;
+        const int MOVE_TICK = 50;
         int _sumTick = 0;
         int _lastIndex = 0;
         public void Update(int deltaTick)
