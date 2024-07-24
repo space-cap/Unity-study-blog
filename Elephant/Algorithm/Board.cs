@@ -8,6 +8,8 @@ namespace Algorithm
     {
         const char CIRCLE = '\u25cf';
         public TileType[,] Tile { get; private set; }
+        public int[,] OpenTrace { get; set; }
+        
         public int Size { get; private set; }
 
         public int DestY { get; private set; }
@@ -29,6 +31,7 @@ namespace Algorithm
             _player = player;
 
             Tile = new TileType[size, size];
+            OpenTrace = new int[size, size];
             Size = size;
 
             DestY = Size - 2;
@@ -154,6 +157,10 @@ namespace Algorithm
                     // 플레이어 좌표를 갖고 와서, 그 좌표랑 현재 y, x가 일치하면 플레이어 전용 색상으로 표시.
                     if (y == _player.PosY && x == _player.PosX)
                         Console.ForegroundColor = ConsoleColor.Blue;
+                    else if (OpenTrace[y, x].Equals(1))
+                    {
+                        Console.ForegroundColor = ConsoleColor.Gray;
+                    }
                     else if (y == DestY && x == DestX)
                         Console.ForegroundColor = ConsoleColor.Yellow;
                     else

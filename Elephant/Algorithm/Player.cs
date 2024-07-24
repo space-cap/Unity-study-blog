@@ -129,6 +129,8 @@ namespace Algorithm
                     open[nextY, nextX] = g + h;
                     pq.Push(new PQNode() { F = g + h, G = g, Y = nextY, X = nextX });
                     parent[nextY, nextX] = new Pos(node.Y, node.X);
+
+                    _board.OpenTrace[nextY, nextX] = 1;
                 }
             }
 
