@@ -7,9 +7,7 @@ public class Player : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-       //GameObject go = GameObject.Find("@Managers");
-       //go.GetComponent<Managers>();
-
+      Managers mg = Managers.Instance;
     }
 
     // Update is called once per frame
