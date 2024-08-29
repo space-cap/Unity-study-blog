@@ -7,6 +7,9 @@ public class Managers : MonoBehaviour
     static Managers s_instance;
     public static Managers Instance { get { Init(); return s_instance; } }
 
+    InputManager _input = new InputManager();
+    public static InputManager Input { get { return Instance._input; } }    
+
     // Start is called before the first frame update
     void Start()
     {
@@ -16,7 +19,7 @@ public class Managers : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        _input.OnUpdate();
     }
 
     static void Init()
