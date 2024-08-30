@@ -11,11 +11,7 @@ public class PrefabTest : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        prefab = Resources.Load<GameObject>("Prefabs/Tank");
-
-
-        tank = Object.Instantiate(prefab);        
-
+        tank = Managers.Resource.Instantiate("Tank");
         Object.Destroy(tank, 3);
     }
 
