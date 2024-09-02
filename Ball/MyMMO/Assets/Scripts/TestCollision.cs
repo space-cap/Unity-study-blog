@@ -5,10 +5,12 @@ using UnityEngine;
 public class TestCollision : MonoBehaviour
 {
 
-    private void OnCollisionEnter(Collider other)
+    void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("collision!");
+        // 충돌 시 실행할 코드
+        Debug.Log("Collision detected with: " + collision.gameObject.name);
     }
+
 
     private void OnTriggerEnter(Collider other)
     {
