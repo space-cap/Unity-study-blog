@@ -29,6 +29,8 @@ public class TestCollision : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        //Debug.Log(Input.mousePosition);
+
+        Debug.Log(Camera.main.ScreenToViewportPoint(Input.mousePosition));
     }
 }
