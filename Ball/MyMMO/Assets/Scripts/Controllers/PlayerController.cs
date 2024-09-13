@@ -37,7 +37,7 @@ public class PlayerController : MonoBehaviour
             { 
                 float moveDist = Mathf.Clamp( _speed * Time.deltaTime, 0, dir.magnitude );
 
-                transform.position = transform.position + dir.normalized * _speed * Time.deltaTime;
+                transform.position = transform.position + dir.normalized * moveDist;
                 transform.LookAt(_destPos);
             }
         }
